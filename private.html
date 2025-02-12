@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Module</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.2/echarts.min.js"></script>
+    <style>
+        .tabs-list {
+            display: flex;
+            justify-content: space-around;
+            cursor: pointer;
+        }
+        .tabs-trigger {
+            padding: 1rem;
+            flex: 1;
+            text-align: center;
+            border-bottom: 2px solid transparent;
+        }
+        .tabs-trigger.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #1f2937;
+        }
+        .tabs-content {
+            display: none;
+        }
+        .tabs-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="w-full space-y-6">
+        <!-- AI运营助手 -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-brain"></i>
+                <h2>AI运营助手</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="flex gap-2">
+                    <input id="query" type="text" placeholder="输入运营需求，如'如何提升用户活跃度...'" class="flex-1 p-3 rounded-lg border">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">获取建议</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">活跃策略</h3>
+                    <p class="text-sm text-gray-600">发现2000位高互动用户，建议启动VIP会员活动</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">留存优化</h3>
+                    <p class="text-sm text-gray-600">近期流失风险上升，建议强化产品使用引导</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心指标 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-users text-blue-600 w-6 h-6"></i>
+                    <h3 class="font-medium">私域用户</h3>
+                </div>
+                <div class="text-2xl font-bold text-blue-600">19K</div>
+                <div class="text-sm text-blue-600">总用户量</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-heart text-purple-600 w-6 h-6"></i>
+                    <h3 class="font-medium">活跃度</h3>
+                </div>
+                <div class="text-2xl font-bold text-purple-600">68%</div>
+                <div class="text-sm text-purple-600">月活率</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-chart-line text-pink-600 w-6 h-6"></i>
+                    <h3 class="font-medium">复购率</h3>
+                </div>
+                <div class="text-2xl font-bold text-pink-600">42%</div>
+                <div class="text-sm text-pink-600">近30天</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-bullseye text-green-600 w-6 h-6"></i>
+                    <h3 class="font-medium">客单价</h3>
+                </div>
+                <div class="text-2xl font-bold text-green-600">¥380</div>
+                <div class="text-sm text-green-600">平均值</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="w-full">
+            <div class="tabs-list">
+                <div class="tabs-trigger active" data-target="#conversion">转化分析</div>
+                <div class="tabs-trigger" data-target="#segment">用户分层</div>
+                <div class="tabs-trigger" data-target="#lifecycle">生命周期</div>
+            </div>
+            <div id="conversion" class="tabs-content active">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">私域转化分析</h3>
+                    <div id="conversionChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="segment" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">用户分层分析</h3>
+                    <div id="segmentChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="lifecycle" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">生命周期管理</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">新客转化</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>欢迎触达</span>
+                                    <span class="text-blue-600">98%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>首购转化</span>
+                                    <span class="text-blue-600">35%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>新人活跃</span>
+                                    <span class="text-blue-600">75%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">成长激活</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>复购率</span>
+                                    <span class="text-purple-600">42%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>会员升级</span>
+                                    <span class="text-purple-600">28%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>互动频次</span>
+                                    <span class="text-purple-600">8次/月</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">价值提升</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>高价值占比</span>
+                                    <span class="text-pink-600">15%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>推荐转化</span>
+                                    <span class="text-pink-600">25%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>月均价值</span>
+                                    <span class="text-pink-600">¥580</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 运营策略建议 -->
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="font-medium mb-4">个性化运营策略</h3>
+            <div class="space-y-4">
+                <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <h3 class="font-medium mb-2">高价值用户运营</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>专属会员权益升级</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>个性化服务体系</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+                    <h3 class="font-medium mb-2">成长用户激活</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>会员成长体系优化</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>复购激励方案</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg">
+                    <h3 class="font-medium mb-2">新客转化提升</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>新人引导流程优化</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>首购转化链路升级</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tabs-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tabs-content').forEach(c => c.classList.remove('active'));
+                trigger.classList.add('active');
+                document.querySelector(trigger.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        const conversionData = [
+            { day: 'Mon', total: 1200, converted: 480, ltv: 220 },
+            { day: 'Tue', total: 1500, converted: 520, ltv: 250 },
+            { day: 'Wed', total: 1100, converted: 460, ltv: 210 },
+            { day: 'Thu', total: 1300, converted: 500, ltv: 240 },
+            { day: 'Fri', total: 1600, converted: 580, ltv: 280 }
+        ];
+
+        const userSegmentData = [
+            { segment: '高价值', users: 2500, engagement: 85, ltv: 450 },
+            { segment: '成长型', users: 5000, engagement: 72, ltv: 280 },
+            { segment: '新客户', users: 8000, engagement: 45, ltv: 120 },
+            { segment: '沉睡型', users: 3500, engagement: 15, ltv: 80 }
+        ];
+
+        const conversionChart = echarts.init(document.getElementById('conversionChart'));
+        const conversionOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['总流量', '转化量', 'LTV']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: conversionData.map(item => item.day)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '总流量',
+                    type: 'line',
+                    data: conversionData.map(item => item.total)
+                },
+                {
+                    name: '转化量',
+                    type: 'line',
+                    data: conversionData.map(item => item.converted)
+                },
+                {
+                    name: 'LTV',
+                    type: 'line',
+                    data: conversionData.map(item => item.ltv)
+                }
+            ]
+        };
+        conversionChart.setOption(conversionOption);
+
+        const segmentChart = echarts.init(document.getElementById('segmentChart'));
+        const segmentOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['用户数', '互动率', 'LTV']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: userSegmentData.map(item => item.segment)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '用户数',
+                    type: 'bar',
+                    data: userSegmentData.map(item => item.users)
+                },
+                {
+                    name: '互动率',
+                    type: 'bar',
+                    data: userSegmentData.map(item => item.engagement)
+                },
+                {
+                    name: 'LTV',
+                    type: 'bar',
+                    data: userSegmentData.map(item => item.ltv)
+                }
+            ]
+        };
+        segmentChart.setOption(segmentOption);
+    </script>
+</body>
+</html>

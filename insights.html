@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights Module</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.2/echarts.min.js"></script>
+    <style>
+        .tabs-list {
+            display: flex;
+            justify-content: space-around;
+            cursor: pointer;
+        }
+        .tabs-trigger {
+            padding: 1rem;
+            flex: 1;
+            text-align: center;
+            border-bottom: 2px solid transparent;
+        }
+        .tabs-trigger.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #1f2937;
+        }
+        .tabs-content {
+            display: none;
+        }
+        .tabs-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="w-full space-y-6">
+        <!-- AI洞察助手 -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-brain"></i>
+                <h2>智能洞察助手</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="flex gap-2">
+                    <input id="query" type="text" placeholder="输入市场洞察需求，如'分析智能家居市场趋势...'" class="flex-1 p-3 rounded-lg border">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">生成洞察</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">竞品洞察</h3>
+                    <p class="text-sm text-gray-600">竞品A近期在智能场景方向发力，建议加强场景化内容输出。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">趋势预测</h3>
+                    <p class="text-sm text-gray-600">预计Q2智能清洁品类将增长35%，建议提前布局。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 洞察指标 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-search text-blue-600 w-6 h-6"></i>
+                    <h3 class="font-medium">搜索热度</h3>
+                </div>
+                <div class="text-2xl font-bold text-blue-600">+32%</div>
+                <div class="text-sm text-blue-600">环比增长</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-chart-line text-purple-600 w-6 h-6"></i>
+                    <h3 class="font-medium">市场份额</h3>
+                </div>
+                <div class="text-2xl font-bold text-purple-600">28.5%</div>
+                <div class="text-sm text-purple-600">领先对手</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-bullseye text-pink-600 w-6 h-6"></i>
+                    <h3 class="font-medium">品牌声量</h3>
+                </div>
+                <div class="text-2xl font-bold text-pink-600">15.2M</div>
+                <div class="text-sm text-pink-600">月度提及</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-brain text-green-600 w-6 h-6"></i>
+                    <h3 class="font-medium">AI预测</h3>
+                </div>
+                <div class="text-2xl font-bold text-green-600">95%</div>
+                <div class="text-sm text-green-600">准确率</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="w-full">
+            <div class="tabs-list">
+                <div class="tabs-trigger active" data-target="#market">市场趋势</div>
+                <div class="tabs-trigger" data-target="#competitor">竞品分析</div>
+                <div class="tabs-trigger" data-target="#prediction">趋势预测</div>
+            </div>
+            <div id="market" class="tabs-content active">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">市场趋势分析</h3>
+                    <div id="marketChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="competitor" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">竞品分析</h3>
+                    <div id="competitorChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="prediction" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">AI趋势预测</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">市场规模预测</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>Q2预测</span>
+                                    <span class="text-blue-600">+35%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>年度预测</span>
+                                    <span class="text-blue-600">+120%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">用户需求预测</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>功能需求</span>
+                                    <span class="text-purple-600">智能联动</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>场景需求</span>
+                                    <span class="text-purple-600">全屋清洁</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">竞争格局预测</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>市场格局</span>
+                                    <span class="text-pink-600">集中化</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>竞争态势</span>
+                                    <span class="text-pink-600">加剧</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 深度洞察报告 -->
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="font-medium mb-4">深度洞察报告</h3>
+            <div class="space-y-4">
+                <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <h3 class="font-medium mb-2">市场机会</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>智能家居集成需求增长，建议加强产品互联能力</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>家庭自动化场景兴起，可开发场景化解决方案</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+                    <h3 class="font-medium mb-2">风险预警</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>竞品价格战趋势明显，需提前制定应对策略</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>技术迭代加快，建议加大研发投入</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg">
+                    <h3 class="font-medium mb-2">行动建议</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>加强场景化内容营销，突出实用性价值</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>布局智能家居生态，构建产品矩阵</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tabs-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tabs-content').forEach(c => c.classList.remove('active'));
+                trigger.classList.add('active');
+                document.querySelector(trigger.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        const marketData = [
+            { month: 'Jan', search: 1200, social: 980, comment: 450 },
+            { month: 'Feb', search: 1400, social: 1100, comment: 580 },
+            { month: 'Mar', search: 1100, social: 1300, comment: 620 },
+            { month: 'Apr', search: 1600, social: 1500, comment: 750 }
+        ];
+
+        const competitorData = [
+            { brand: '本品', awareness: 85, engagement: 4.2, conversion: 2.8 },
+            { brand: '竞品A', awareness: 75, engagement: 3.8, conversion: 2.2 },
+            { brand: '竞品B', awareness: 68, engagement: 3.5, conversion: 2.0 },
+            { brand: '竞品C', awareness: 72, engagement: 3.6, conversion: 2.1 }
+        ];
+
+        const marketChart = echarts.init(document.getElementById('marketChart'));
+        const marketOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['搜索趋势', '社交热度', '评论量']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: marketData.map(item => item.month)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '搜索趋势',
+                    type: 'line',
+                    data: marketData.map(item => item.search)
+                },
+                {
+                    name: '社交热度',
+                    type: 'line',
+                    data: marketData.map(item => item.social)
+                },
+                {
+                    name: '评论量',
+                    type: 'line',
+                    data: marketData.map(item => item.comment)
+                }
+            ]
+        };
+        marketChart.setOption(marketOption);
+
+        const competitorChart = echarts.init(document.getElementById('competitorChart'));
+        const competitorOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['品牌认知度', '互动率', '转化率']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: competitorData.map(item => item.brand)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '品牌认知度',
+                    type: 'bar',
+                    data: competitorData.map(item => item.awareness)
+                },
+                {
+                    name: '互动率',
+                    type: 'bar',
+                    data: competitorData.map(item => item.engagement)
+                },
+                {
+                    name: '转化率',
+                    type: 'bar',
+                    data: competitorData.map(item => item.conversion)
+                }
+            ]
+        };
+        competitorChart.setOption(competitorOption);
+    </script>
+</body>
+</html>

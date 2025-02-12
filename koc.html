@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOC Module</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.2/echarts.min.js"></script>
+    <style>
+        .tabs-list {
+            display: flex;
+            justify-content: space-around;
+            cursor: pointer;
+        }
+        .tabs-trigger {
+            padding: 1rem;
+            flex: 1;
+            text-align: center;
+            border-bottom: 2px solid transparent;
+        }
+        .tabs-trigger.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #1f2937;
+        }
+        .tabs-content {
+            display: none;
+        }
+        .tabs-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="w-full space-y-6">
+        <!-- AI创作助手 -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-brain"></i>
+                <h2>AI创作助手</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="flex gap-2">
+                    <input id="query" type="text" placeholder="输入创作需求，如'生成一个智能扫地机产品测评脚本...'" class="flex-1 p-3 rounded-lg border">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">生成创意</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">脚本建议</h3>
+                    <p class="text-sm text-gray-600">建议开场展示产品核心功能，突出智能交互特点。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">拍摄建议</h3>
+                    <p class="text-sm text-gray-600">采用多角度展示，突出产品实际使用效果。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心指标 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-video text-blue-600 w-6 h-6"></i>
+                    <h3 class="font-medium">日均产出</h3>
+                </div>
+                <div class="text-2xl font-bold text-blue-600">45</div>
+                <div class="text-sm text-blue-600">视频/天</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-star text-purple-600 w-6 h-6"></i>
+                    <h3 class="font-medium">爆款率</h3>
+                </div>
+                <div class="text-2xl font-bold text-purple-600">4.7%</div>
+                <div class="text-sm text-purple-600">行业前5%</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-users text-pink-600 w-6 h-6"></i>
+                    <h3 class="font-medium">达人矩阵</h3>
+                </div>
+                <div class="text-2xl font-bold text-pink-600">12</div>
+                <div class="text-sm text-pink-600">活跃达人</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-chart-line text-green-600 w-6 h-6"></i>
+                    <h3 class="font-medium">平均互动</h3>
+                </div>
+                <div class="text-2xl font-bold text-green-600">4.2%</div>
+                <div class="text-sm text-green-600">高于均值</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="w-full">
+            <div class="tabs-list">
+                <div class="tabs-trigger active" data-target="#production">内容生产</div>
+                <div class="tabs-trigger" data-target="#creator">达人表现</div>
+                <div class="tabs-trigger" data-target="#content">内容分析</div>
+            </div>
+            <div id="production" class="tabs-content active">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">内容生产分析</h3>
+                    <div id="contentChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="creator" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">达人表现分析</h3>
+                    <div id="creatorChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="content" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">内容效果分析</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">爆款特征</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>开场展示</span>
+                                    <span class="text-blue-600">+45%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>情节设计</span>
+                                    <span class="text-blue-600">+38%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>画面质量</span>
+                                    <span class="text-blue-600">+32%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">内容类型</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>测评类</span>
+                                    <span class="text-purple-600">42%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>场景类</span>
+                                    <span class="text-purple-600">35%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>教程类</span>
+                                    <span class="text-purple-600">23%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">转化效果</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>直接转化</span>
+                                    <span class="text-pink-600">2.8%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>间接影响</span>
+                                    <span class="text-pink-600">4.5%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>品牌提升</span>
+                                    <span class="text-pink-600">15%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI创意优化建议 -->
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="font-medium mb-4">AI创意优化建议</h3>
+            <div class="space-y-4">
+                <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <h3 class="font-medium mb-2">内容策略优化</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>增加实用性场景展示，提升用户共鸣</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>强化产品差异化亮点展示</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+                    <h3 class="font-medium mb-2">创作流程优化</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>优化前期选题机制</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>加强后期品质管控</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg">
+                    <h3 class="font-medium mb-2">达人管理建议</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>针对性培训和赋能</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>建立创作激励机制</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tabs-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tabs-content').forEach(c => c.classList.remove('active'));
+                trigger.classList.add('active');
+                document.querySelector(trigger.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        const contentData = [
+            { day: 'Mon', target: 40, actual: 45, viral: 3 },
+            { day: 'Tue', target: 40, actual: 42, viral: 2 },
+            { day: 'Wed', target: 40, actual: 48, viral: 4 },
+            { day: 'Thu', target: 40, actual: 38, viral: 2 },
+            { day: 'Fri', target: 40, actual: 52, viral: 5 }
+        ];
+
+        const creatorData = [
+            { creator: '达人A', content: 45, engagement: 4.2, conversion: 2.8 },
+            { creator: '达人B', content: 38, engagement: 3.8, conversion: 2.5 },
+            { creator: '达人C', content: 52, engagement: 4.5, conversion: 3.2 },
+            { creator: '达人D', content: 35, engagement: 4.0, conversion: 2.6 }
+        ];
+
+        const contentChart = echarts.init(document.getElementById('contentChart'));
+        const contentOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['目标量', '实际产出', '爆款数']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: contentData.map(item => item.day)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '目标量',
+                    type: 'line',
+                    data: contentData.map(item => item.target)
+                },
+                {
+                    name: '实际产出',
+                    type: 'line',
+                    data: contentData.map(item => item.actual)
+                },
+                {
+                    name: '爆款数',
+                    type: 'line',
+                    data: contentData.map(item => item.viral)
+                }
+            ]
+        };
+        contentChart.setOption(contentOption);
+
+        const creatorChart = echarts.init(document.getElementById('creatorChart'));
+        const creatorOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['内容量', '互动率', '转化率']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: creatorData.map(item => item.creator)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '内容量',
+                    type: 'bar',
+                    data: creatorData.map(item => item.content)
+                },
+                {
+                    name: '互动率',
+                    type: 'bar',
+                    data: creatorData.map(item => item.engagement)
+                },
+                {
+                    name: '转化率',
+                    type: 'bar',
+                    data: creatorData.map(item => item.conversion)
+                }
+            ]
+        };
+        creatorChart.setOption(creatorOption);
+    </script>
+</body>
+</html>

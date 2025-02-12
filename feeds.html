@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feeds Module</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.2/echarts.min.js"></script>
+    <style>
+        .tabs-list {
+            display: flex;
+            justify-content: space-around;
+            cursor: pointer;
+        }
+        .tabs-trigger {
+            padding: 1rem;
+            flex: 1;
+            text-align: center;
+            border-bottom: 2px solid transparent;
+        }
+        .tabs-trigger.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #1f2937;
+        }
+        .tabs-content {
+            display: none;
+        }
+        .tabs-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="w-full space-y-6">
+        <!-- AI投放助手 -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-brain"></i>
+                <h2>AI投放助手</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="flex gap-2">
+                    <input id="query" type="text" placeholder="输入投放需求，如'优化TikTok广告效果...'" class="flex-1 p-3 rounded-lg border">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">优化建议</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">预算建议</h3>
+                    <p class="text-sm text-gray-600">建议将30%预算转移至高ROI的TikTok平台</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
+                    <h3 class="font-medium mb-2">创意优化</h3>
+                    <p class="text-sm text-gray-600">发现3个高转化创意模式，建议扩大投放</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心指标 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-bullseye text-blue-600 w-6 h-6"></i>
+                    <h3 class="font-medium">日均展示</h3>
+                </div>
+                <div class="text-2xl font-bold text-blue-600">87.6K</div>
+                <div class="text-sm text-blue-600">展现量</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-dollar-sign text-purple-600 w-6 h-6"></i>
+                    <h3 class="font-medium">ROI</h3>
+                </div>
+                <div class="text-2xl font-bold text-purple-600">3.2</div>
+                <div class="text-sm text-purple-600">投资回报</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-chart-line text-pink-600 w-6 h-6"></i>
+                    <h3 class="font-medium">CTR</h3>
+                </div>
+                <div class="text-2xl font-bold text-pink-600">4.8%</div>
+                <div class="text-sm text-pink-600">点击率</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-bolt text-green-600 w-6 h-6"></i>
+                    <h3 class="font-medium">转化率</h3>
+                </div>
+                <div class="text-2xl font-bold text-green-600">12.5%</div>
+                <div class="text-sm text-green-600">购买转化</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="w-full">
+            <div class="tabs-list">
+                <div class="tabs-trigger active" data-target="#performance">投放效果</div>
+                <div class="tabs-trigger" data-target="#platform">平台分析</div>
+                <div class="tabs-trigger" data-target="#creative">创意优化</div>
+            </div>
+            <div id="performance" class="tabs-content active">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">投放效果分析</h3>
+                    <div id="performanceChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="platform" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">平台效果分析</h3>
+                    <div id="platformChart" class="h-80"></div>
+                </div>
+            </div>
+            <div id="creative" class="tabs-content">
+                <div class="p-6 bg-white rounded-lg shadow">
+                    <h3 class="font-medium mb-4">创意优化分析</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">爆款元素</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>开场展示</span>
+                                    <span class="text-blue-600">CTR +45%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>产品展示</span>
+                                    <span class="text-blue-600">转化 +32%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>行动引导</span>
+                                    <span class="text-blue-600">点击 +28%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">素材分析</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>视频时长</span>
+                                    <span class="text-purple-600">15-20s</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>主题风格</span>
+                                    <span class="text-purple-600">生活化</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>画面风格</span>
+                                    <span class="text-purple-600">明亮自然</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium mb-2">优化方向</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span>素材更新</span>
+                                    <span class="text-pink-600">3天/次</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>测试力度</span>
+                                    <span class="text-pink-600">5组/周</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>迭代速度</span>
+                                    <span class="text-pink-600">24h</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 投放优化策略 -->
+        <div class="p-6 bg-white rounded-lg shadow">
+            <h3 class="font-medium mb-4">投放优化策略</h3>
+            <div class="space-y-4">
+                <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <h3 class="font-medium mb-2">预算优化</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>向高ROI平台倾斜投放预算</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span>优化时段分配策略</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+                    <h3 class="font-medium mb-2">创意策略</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>加强爆款视频素材转化</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <span>持续优化素材表现</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg">
+                    <h3 class="font-medium mb-2">人群策略</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>精细化人群分层</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
+                            <span>智能出价策略</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tabs-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tabs-content').forEach(c => c.classList.remove('active'));
+                trigger.classList.add('active');
+                document.querySelector(trigger.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        const performanceData = [
+            { day: 'Mon', impression: 85000, click: 4200, conversion: 580 },
+            { day: 'Tue', impression: 92000, click: 4800, conversion: 620 },
+            { day: 'Wed', impression: 78000, click: 3900, conversion: 480 },
+            { day: 'Thu', impression: 88000, click: 4500, conversion: 600 },
+            { day: 'Fri', impression: 95000, click: 5100, conversion: 680 }
+        ];
+
+        const platformData = [
+            { platform: 'TikTok', budget: 12000, roi: 3.2, ctr: 4.8 },
+            { platform: 'Kuaishou', budget: 8000, roi: 2.8, ctr: 4.2 },
+            { platform: 'RED', budget: 6000, roi: 2.5, ctr: 3.8 },
+            { platform: 'Douyin', budget: 15000, roi: 3.5, ctr: 5.2 }
+        ];
+
+        const performanceChart = echarts.init(document.getElementById('performanceChart'));
+        const performanceOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['展示量', '点击量', '转化量']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: performanceData.map(item => item.day)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '展示量',
+                    type: 'line',
+                    data: performanceData.map(item => item.impression)
+                },
+                {
+                    name: '点击量',
+                    type: 'line',
+                    data: performanceData.map(item => item.click)
+                },
+                {
+                    name: '转化量',
+                    type: 'line',
+                    data: performanceData.map(item => item.conversion)
+                }
+            ]
+        };
+        performanceChart.setOption(performanceOption);
+
+        const platformChart = echarts.init(document.getElementById('platformChart'));
+        const platformOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['预算', 'ROI', 'CTR%']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: platformData.map(item => item.platform)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '预算',
+                    type: 'bar',
+                    data: platformData.map(item => item.budget)
+                },
+                {
+                    name: 'ROI',
+                    type: 'bar',
+                    data: platformData.map(item => item.roi)
+                },
+                {
+                    name: 'CTR%',
+                    type: 'bar',
+                    data: platformData.map(item => item.ctr)
+                }
+            ]
+        };
+        platformChart.setOption(platformOption);
+    </script>
+</body>
+</html>
