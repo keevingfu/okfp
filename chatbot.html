@@ -287,8 +287,7 @@
     </main>
 
     <script>
-        const OPENAI_API_KEY = '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'; // 替换为你的 OpenAI API key
-        const API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+        const PERPLEXITY_API_KEY = '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'; // 替换为你的 Perplexity API key
         let isThinking = false;
 
         async function sendMessage() {
@@ -307,14 +306,14 @@
             showThinking();
 
             try {
-                const response = await fetch(API_ENDPOINT, {
+                const response = await fetch('https://api.perplexity.ai/chat/completions', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                        'Authorization': 'Bearer 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',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: "gpt-4",  // 修改为标准的 GPT-4 模型名称
+                        model: "sonar-pro",
                         messages: [{
                             role: "system",
                             content: `你是一个专业的内容营销和增长策略顾问。请按照以下格式提供分析和建议：
@@ -341,15 +340,11 @@
 
 # 延伸思考
 - 提供3个相关的后续问题
-- 每个问题都应该帮助深化或拓展当前话题
-
-请确保回答专业、具体且可执行。使用数据支持论点，给出明确的行动建议。`
+- 每个问题都应该帮助深化或拓展当前话题`
                         }, {
                             role: "user",
                             content: message
-                        }],
-                        temperature: 0.7,
-                        max_tokens: 2000
+                        }]
                     })
                 });
 
@@ -367,6 +362,9 @@
                 const aiResponse = parseAIResponse(responseText);
                 appendMessage('ai', aiResponse);
 
+                // 生成相关问题
+                generateRelatedQuestions(message);
+
             } catch (error) {
                 console.error('Error:', error);
                 hideThinking();
@@ -377,11 +375,10 @@
         }
 
         function parseAIResponse(text) {
-            // 使用正则表达式解析 markdown 格式的响应
             const sections = {
                 searchResults: [],
                 reasoning: [],
-                answer: '',
+                answer: text,
                 nextQuestions: []
             };
 
@@ -406,9 +403,6 @@
                     .filter(line => line.trim().match(/^\d+\./))
                     .map(line => line.replace(/^\d+\./, '').trim());
             }
-
-            // 提取主要内容
-            sections.answer = text;
 
             // 解析延伸思考
             const questionsMatch = text.match(/# 延伸思考\n([\s\S]*?)(?=\n#|$)/);
