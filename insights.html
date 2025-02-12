@@ -29,28 +29,79 @@
         .tabs-content.active {
             display: block;
         }
+        .quadrant-chart {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .quadrant-label {
+            position: absolute;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        .quadrant-label.q1 { top: 10px; right: 10px; }
+        .quadrant-label.q2 { top: 10px; left: 10px; }
+        .quadrant-label.q3 { bottom: 10px; left: 10px; }
+        .quadrant-label.q4 { bottom: 10px; right: 10px; }
+        .chat-message {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background-color: #f0f9ff;
+            margin-left: 20%;
+        }
+        .bot-message {
+            background-color: #f8f9fa;
+            margin-right: 20%;
+        }
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            padding: 8px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: typing 1s infinite ease-in-out;
+        }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
     <div class="w-full space-y-6">
         <!-- AI洞察助手 -->
         <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-brain"></i>
-                <h2>智能洞察助手</h2>
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-brain text-blue-600"></i>
+                <h2 class="text-xl font-semibold">AI洞察助手</h2>
             </div>
             <div class="space-y-4">
                 <div class="flex gap-2">
-                    <input id="query" type="text" placeholder="输入市场洞察需求，如'分析智能家居市场趋势...'" class="flex-1 p-3 rounded-lg border">
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">生成洞察</button>
+                    <input 
+                        id="queryInput" 
+                        type="text" 
+                        placeholder="输入市场洞察需求，如'分析智能家居市场趋势...'" 
+                        class="flex-1 p-3 rounded-lg border"
+                    >
+                    <button 
+                        onclick="sendQuery()" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    >
+                        <i class="fas fa-lightbulb"></i>
+                        洞察分析
+                    </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
-                    <h3 class="font-medium mb-2">竞品洞察</h3>
-                    <p class="text-sm text-gray-600">竞品A近期在智能场景方向发力，建议加强场景化内容输出。</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
-                    <h3 class="font-medium mb-2">趋势预测</h3>
-                    <p class="text-sm text-gray-600">预计Q2智能清洁品类将增长35%，建议提前布局。</p>
+                <div id="chatHistory" class="max-h-80 overflow-y-auto bg-white p-4 rounded-lg">
+                    <!-- 聊天记录将在这里动态添加 -->
                 </div>
             </div>
         </div>
@@ -59,7 +110,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-search text-blue-600 w-6 h-6"></i>
+                    <i class="fas fa-search text-blue-600"></i>
                     <h3 class="font-medium">搜索热度</h3>
                 </div>
                 <div class="text-2xl font-bold text-blue-600">+32%</div>
@@ -67,7 +118,7 @@
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-chart-line text-purple-600 w-6 h-6"></i>
+                    <i class="fas fa-chart-line text-purple-600"></i>
                     <h3 class="font-medium">市场份额</h3>
                 </div>
                 <div class="text-2xl font-bold text-purple-600">28.5%</div>
@@ -75,7 +126,7 @@
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-bullseye text-pink-600 w-6 h-6"></i>
+                    <i class="fas fa-bullseye text-pink-600"></i>
                     <h3 class="font-medium">品牌声量</h3>
                 </div>
                 <div class="text-2xl font-bold text-pink-600">15.2M</div>
@@ -83,7 +134,7 @@
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-brain text-green-600 w-6 h-6"></i>
+                    <i class="fas fa-brain text-green-600"></i>
                     <h3 class="font-medium">AI预测</h3>
                 </div>
                 <div class="text-2xl font-bold text-green-600">95%</div>
@@ -91,86 +142,58 @@
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="w-full">
-            <div class="tabs-list">
-                <div class="tabs-trigger active" data-target="#market">市场趋势</div>
-                <div class="tabs-trigger" data-target="#competitor">竞品分析</div>
-                <div class="tabs-trigger" data-target="#prediction">趋势预测</div>
+        <!-- 主要内容区 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 市场趋势分析 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-blue-600"></i>
+                    市场趋势分析
+                </h3>
+                <div id="marketTrendChart" class="h-80"></div>
             </div>
-            <div id="market" class="tabs-content active">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">市场趋势分析</h3>
-                    <div id="marketChart" class="h-80"></div>
-                </div>
+
+            <!-- 用户需求四象限 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-bullseye text-purple-600"></i>
+                    用户需求四象限
+                </h3>
+                <div id="userQuadrantChart" class="h-80"></div>
             </div>
-            <div id="competitor" class="tabs-content">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">竞品分析</h3>
-                    <div id="competitorChart" class="h-80"></div>
-                </div>
+
+            <!-- 竞品分析 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-bar text-pink-600"></i>
+                    竞品分析
+                </h3>
+                <div id="competitorChart" class="h-80"></div>
             </div>
-            <div id="prediction" class="tabs-content">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">AI趋势预测</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium mb-2">市场规模预测</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span>Q2预测</span>
-                                    <span class="text-blue-600">+35%</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>年度预测</span>
-                                    <span class="text-blue-600">+120%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium mb-2">用户需求预测</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span>功能需求</span>
-                                    <span class="text-purple-600">智能联动</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>场景需求</span>
-                                    <span class="text-purple-600">全屋清洁</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium mb-2">竞争格局预测</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span>市场格局</span>
-                                    <span class="text-pink-600">集中化</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>竞争态势</span>
-                                    <span class="text-pink-600">加剧</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+            <!-- 用户评价分析 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-comments text-green-600"></i>
+                    用户评价分析
+                </h3>
+                <div id="userReviewChart" class="h-80"></div>
             </div>
         </div>
 
-        <!-- 深度洞察报告 -->
-        <div class="p-6 bg-white rounded-lg shadow">
-            <h3 class="font-medium mb-4">深度洞察报告</h3>
+        <!-- 洞察报告 -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="font-medium mb-4">洞察报告</h3>
             <div class="space-y-4">
                 <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                     <h3 class="font-medium mb-2">市场机会</h3>
                     <ul class="space-y-2 text-sm">
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <i class="fas fa-check-circle text-blue-600"></i>
                             <span>智能家居集成需求增长，建议加强产品互联能力</span>
                         </li>
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <i class="fas fa-check-circle text-blue-600"></i>
                             <span>家庭自动化场景兴起，可开发场景化解决方案</span>
                         </li>
                     </ul>
@@ -179,25 +202,12 @@
                     <h3 class="font-medium mb-2">风险预警</h3>
                     <ul class="space-y-2 text-sm">
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <i class="fas fa-exclamation-circle text-red-600"></i>
                             <span>竞品价格战趋势明显，需提前制定应对策略</span>
                         </li>
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
+                            <i class="fas fa-exclamation-circle text-red-600"></i>
                             <span>技术迭代加快，建议加大研发投入</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg">
-                    <h3 class="font-medium mb-2">行动建议</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
-                            <span>加强场景化内容营销，突出实用性价值</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
-                            <span>布局智能家居生态，构建产品矩阵</span>
                         </li>
                     </ul>
                 </div>
@@ -206,31 +216,109 @@
     </div>
 
     <script>
-        document.querySelectorAll('.tabs-trigger').forEach(trigger => {
-            trigger.addEventListener('click', () => {
-                document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tabs-content').forEach(c => c.classList.remove('active'));
-                trigger.classList.add('active');
-                document.querySelector(trigger.getAttribute('data-target')).classList.add('active');
-            });
-        });
+        // Perplexity AI API 配置
+        const PERPLEXITY_API_KEY = 'YOUR_PERPLEXITY_API_KEY'; // 替换为实际的API key
+        const API_ENDPOINT = 'https://api.perplexity.ai/chat/completions';
 
-        const marketData = [
-            { month: 'Jan', search: 1200, social: 980, comment: 450 },
-            { month: 'Feb', search: 1400, social: 1100, comment: 580 },
-            { month: 'Mar', search: 1100, social: 1300, comment: 620 },
-            { month: 'Apr', search: 1600, social: 1500, comment: 750 }
-        ];
+        let chatHistory = [];
 
-        const competitorData = [
-            { brand: '本品', awareness: 85, engagement: 4.2, conversion: 2.8 },
-            { brand: '竞品A', awareness: 75, engagement: 3.8, conversion: 2.2 },
-            { brand: '竞品B', awareness: 68, engagement: 3.5, conversion: 2.0 },
-            { brand: '竞品C', awareness: 72, engagement: 3.6, conversion: 2.1 }
-        ];
+        // Chatbot功能实现
+        async function sendQuery() {
+            const input = document.getElementById('queryInput');
+            const query = input.value.trim();
+            if (!query) return;
 
-        const marketChart = echarts.init(document.getElementById('marketChart'));
-        const marketOption = {
+            appendMessage('user', query);
+            input.value = '';
+            showTypingIndicator();
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'mixtral-8x7b-instruct',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: '你是OIKFP系统的市场洞察专家，专注于市场趋势分析和竞品分析。'
+                            },
+                            ...chatHistory,
+                            { role: 'user', content: query }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                hideTypingIndicator();
+                const aiResponse = data.choices[0].message.content;
+                appendMessage('assistant', aiResponse);
+                chatHistory.push(
+                    { role: 'user', content: query },
+                    { role: 'assistant', content: aiResponse }
+                );
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                appendMessage('system', '抱歉，出现了一些问题，请稍后再试。');
+            }
+        }
+
+        // 消息展示相关函数
+        function appendMessage(role, content) {
+            const chatHistoryElement = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role === 'user' ? 'user-message' : 'bot-message'}`;
+            
+            const iconClass = role === 'user' ? 'fa-user' : 'fa-robot';
+            const iconColor = role === 'user' ? 'text-blue-600' : 'text-purple-600';
+            
+            messageDiv.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <i class="fas ${iconClass} ${iconColor}"></i>
+                    <div class="flex-1">
+                        <div class="font-medium mb-1">${role === 'user' ? '您' : 'AI助手'}</div>
+                        <div class="text-sm">${content}</div>
+                    </div>
+                </div>
+            `;
+            
+            chatHistoryElement.appendChild(messageDiv);
+            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const chatHistoryElement = document.getElementById('chatHistory');
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'typingIndicator';
+            indicatorDiv.className = 'typing-indicator';
+            indicatorDiv.innerHTML = `
+                <div class="typing-dot" style="animation-delay: 0s"></div>
+                <div class="typing-dot" style="animation-delay: 0.2s"></div>
+                <div class="typing-dot" style="animation-delay: 0.4s"></div>
+            `;
+            chatHistoryElement.appendChild(indicatorDiv);
+            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        // 初始化图表
+        const marketTrendChart = echarts.init(document.getElementById('marketTrendChart'));
+        const userQuadrantChart = echarts.init(document.getElementById('userQuadrantChart'));
+        const competitorChart = echarts.init(document.getElementById('competitorChart'));
+        const userReviewChart = echarts.init(document.getElementById('userReviewChart'));
+
+        // 市场趋势图配置
+        const marketTrendOption = {
             tooltip: {
                 trigger: 'axis'
             },
@@ -246,7 +334,7 @@
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                data: marketData.map(item => item.month)
+                data: ['1月', '2月', '3月', '4月', '5月', '6月']
             },
             yAxis: {
                 type: 'value'
@@ -255,29 +343,67 @@
                 {
                     name: '搜索趋势',
                     type: 'line',
-                    data: marketData.map(item => item.search)
+                    smooth: true,
+                    data: [1200, 1400, 1100, 1600, 1800, 2000]
                 },
                 {
                     name: '社交热度',
                     type: 'line',
-                    data: marketData.map(item => item.social)
+                    smooth: true,
+                    data: [980, 1100, 1300, 1500, 1700, 1900]
                 },
                 {
                     name: '评论量',
                     type: 'line',
-                    data: marketData.map(item => item.comment)
+                    smooth: true,
+                    data: [450, 580, 620, 750, 850, 950]
                 }
             ]
         };
-        marketChart.setOption(marketOption);
 
-        const competitorChart = echarts.init(document.getElementById('competitorChart'));
+        // 用户需求四象限图配置
+        const userQuadrantOption = {
+            tooltip: {
+                trigger: 'item'
+            },
+            xAxis: {
+                type: 'value',
+                name: '市场需求',
+                splitLine: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                name: '增长潜力',
+                splitLine: { show: false }
+            },
+            series: [
+                {
+                    type: 'scatter',
+                    data: [
+                        [85, 90, '智能清洁'],
+                        [75, 85, '自动化控制'],
+                        [90, 95, '场景联动']
+                    ],
+                    symbolSize: 20,
+                    label: {
+                        show: true,
+                        formatter: function(param) {
+                            return param.data[2];
+                        },
+                        position: 'right'
+                    }
+                }
+            ]
+        };
+
+        // 竞品分析图配置
         const competitorOption = {
             tooltip: {
-                trigger: 'axis'
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' }
             },
             legend: {
-                data: ['品牌认知度', '互动率', '转化率']
+                data: ['品牌认知度', '产品口碑', '市场份额']
             },
             grid: {
                 left: '3%',
@@ -287,7 +413,7 @@
             },
             xAxis: {
                 type: 'category',
-                data: competitorData.map(item => item.brand)
+                data: ['本品', '竞品A', '竞品B', '竞品C']
             },
             yAxis: {
                 type: 'value'
@@ -296,21 +422,78 @@
                 {
                     name: '品牌认知度',
                     type: 'bar',
-                    data: competitorData.map(item => item.awareness)
+                    data: [85, 75, 68, 72]
                 },
                 {
-                    name: '互动率',
+                    name: '产品口碑',
                     type: 'bar',
-                    data: competitorData.map(item => item.engagement)
+                    data: [82, 70, 65, 68]
                 },
                 {
-                    name: '转化率',
+                    name: '市场份额',
                     type: 'bar',
-                    data: competitorData.map(item => item.conversion)
+                    data: [28, 25, 22, 24]
                 }
             ]
         };
+
+        // 用户评价分析图配置
+        const userReviewOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['好评', '中评', '差评', '追评', '维权']
+            },
+            series: [
+                {
+                    name: '用户评价',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}: {c}%'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '14',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    data: [
+                        { value: 68, name: '好评', itemStyle: { color: '#4ade80' } },
+                        { value: 20, name: '中评', itemStyle: { color: '#fbbf24' } },
+                        { value: 8, name: '差评', itemStyle: { color: '#f87171' } },
+                        { value: 3, name: '追评', itemStyle: { color: '#60a5fa' } },
+                        { value: 1, name: '维权', itemStyle: { color: '#94a3b8' } }
+                    ]
+                }
+            ]
+        };
+
+        // 设置图表配置
+        marketTrendChart.setOption(marketTrendOption);
+        userQuadrantChart.setOption(userQuadrantOption);
         competitorChart.setOption(competitorOption);
+        userReviewChart.setOption(userReviewOption);
+
+        // 响应式处理
+        window.addEventListener('resize', () => {
+            marketTrendChart.resize();
+            userQuadrantChart.resize();
+            competitorChart.resize();
+            userReviewChart.resize();
+        });
     </script>
 </body>
 </html>

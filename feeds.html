@@ -29,37 +29,92 @@
         .tabs-content.active {
             display: block;
         }
+
+        .chat-message {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background-color: #f0f9ff;
+            margin-left: 20%;
+        }
+        .bot-message {
+            background-color: #f8f9fa;
+            margin-right: 20%;
+        }
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            padding: 8px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: typing 1s infinite ease-in-out;
+        }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .ad-preview {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .ad-preview-header {
+            padding: 0.5rem;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .ad-preview-content {
+            padding: 1rem;
+        }
+        .ad-preview-footer {
+            padding: 0.5rem;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
     <div class="w-full space-y-6">
         <!-- AI投放助手 -->
         <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-brain"></i>
-                <h2>AI投放助手</h2>
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-bullseye text-blue-600"></i>
+                <h2 class="text-xl font-semibold">AI投放助手</h2>
             </div>
             <div class="space-y-4">
                 <div class="flex gap-2">
-                    <input id="query" type="text" placeholder="输入投放需求，如'优化TikTok广告效果...'" class="flex-1 p-3 rounded-lg border">
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">优化建议</button>
+                    <input 
+                        id="queryInput" 
+                        type="text" 
+                        placeholder="输入投放需求，如'优化TikTok广告效果...'" 
+                        class="flex-1 p-3 rounded-lg border"
+                    >
+                    <button 
+                        onclick="sendQuery()" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    >
+                        <i class="fas fa-magic"></i>
+                        优化建议
+                    </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
-                    <h3 class="font-medium mb-2">预算建议</h3>
-                    <p class="text-sm text-gray-600">建议将30%预算转移至高ROI的TikTok平台</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
-                    <h3 class="font-medium mb-2">创意优化</h3>
-                    <p class="text-sm text-gray-600">发现3个高转化创意模式，建议扩大投放</p>
+                <div id="chatHistory" class="max-h-80 overflow-y-auto bg-white p-4 rounded-lg">
+                    <!-- 聊天记录将在这里动态添加 -->
                 </div>
             </div>
         </div>
 
-        <!-- 核心指标 -->
+        <!-- 投放指标 -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-bullseye text-blue-600 w-6 h-6"></i>
+                    <i class="fas fa-eye text-blue-600"></i>
                     <h3 class="font-medium">日均展示</h3>
                 </div>
                 <div class="text-2xl font-bold text-blue-600">87.6K</div>
@@ -67,149 +122,97 @@
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-dollar-sign text-purple-600 w-6 h-6"></i>
-                    <h3 class="font-medium">ROI</h3>
+                    <i class="fas fa-hand-pointer text-purple-600"></i>
+                    <h3 class="font-medium">点击率</h3>
                 </div>
-                <div class="text-2xl font-bold text-purple-600">3.2</div>
-                <div class="text-sm text-purple-600">投资回报</div>
+                <div class="text-2xl font-bold text-purple-600">4.8%</div>
+                <div class="text-sm text-purple-600">CTR</div>
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-chart-line text-pink-600 w-6 h-6"></i>
-                    <h3 class="font-medium">CTR</h3>
-                </div>
-                <div class="text-2xl font-bold text-pink-600">4.8%</div>
-                <div class="text-sm text-pink-600">点击率</div>
-            </div>
-            <div class="p-6 bg-white rounded-lg shadow">
-                <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-bolt text-green-600 w-6 h-6"></i>
+                    <i class="fas fa-shopping-cart text-pink-600"></i>
                     <h3 class="font-medium">转化率</h3>
                 </div>
-                <div class="text-2xl font-bold text-green-600">12.5%</div>
-                <div class="text-sm text-green-600">购买转化</div>
+                <div class="text-2xl font-bold text-pink-600">2.5%</div>
+                <div class="text-sm text-pink-600">CVR</div>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-dollar-sign text-green-600"></i>
+                    <h3 class="font-medium">ROI</h3>
+                </div>
+                <div class="text-2xl font-bold text-green-600">3.2</div>
+                <div class="text-sm text-green-600">投资回报</div>
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="w-full">
-            <div class="tabs-list">
-                <div class="tabs-trigger active" data-target="#performance">投放效果</div>
-                <div class="tabs-trigger" data-target="#platform">平台分析</div>
-                <div class="tabs-trigger" data-target="#creative">创意优化</div>
+        <!-- 主要内容区 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 左侧：投放效果趋势 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-blue-600"></i>
+                    投放效果趋势
+                </h3>
+                <div id="performanceChart" class="h-80"></div>
             </div>
-            <div id="performance" class="tabs-content active">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">投放效果分析</h3>
-                    <div id="performanceChart" class="h-80"></div>
+
+            <!-- 右侧：平台分布 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-purple-600"></i>
+                    平台分布分析
+                </h3>
+                <div id="platformChart" class="h-80"></div>
+            </div>
+        </div>
+
+        <!-- 素材分析 -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="font-medium mb-4">素材分析</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-medium mb-2">素材效果</h3>
+                    <div id="creativeChart" class="h-60"></div>
                 </div>
-            </div>
-            <div id="platform" class="tabs-content">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">平台效果分析</h3>
-                    <div id="platformChart" class="h-80"></div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-medium mb-2">素材类型</h3>
+                    <div id="creativeTypeChart" class="h-60"></div>
                 </div>
-            </div>
-            <div id="creative" class="tabs-content">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">创意优化分析</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium mb-2">爆款元素</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span>开场展示</span>
-                                    <span class="text-blue-600">CTR +45%</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>产品展示</span>
-                                    <span class="text-blue-600">转化 +32%</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>行动引导</span>
-                                    <span class="text-blue-600">点击 +28%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium mb-2">素材分析</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span>视频时长</span>
-                                    <span class="text-purple-600">15-20s</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>主题风格</span>
-                                    <span class="text-purple-600">生活化</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>画面风格</span>
-                                    <span class="text-purple-600">明亮自然</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium mb-2">优化方向</h3>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span>素材更新</span>
-                                    <span class="text-pink-600">3天/次</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>测试力度</span>
-                                    <span class="text-pink-600">5组/周</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>迭代速度</span>
-                                    <span class="text-pink-600">24h</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-medium mb-2">素材时长</h3>
+                    <div id="creativeDurationChart" class="h-60"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 投放优化策略 -->
-        <div class="p-6 bg-white rounded-lg shadow">
-            <h3 class="font-medium mb-4">投放优化策略</h3>
+        <!-- 投放优化建议 -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="font-medium mb-4">投放优化建议</h3>
             <div class="space-y-4">
                 <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                     <h3 class="font-medium mb-2">预算优化</h3>
                     <ul class="space-y-2 text-sm">
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
-                            <span>向高ROI平台倾斜投放预算</span>
+                            <i class="fas fa-check-circle text-blue-600"></i>
+                            <span>建议将30%预算转移至高ROI的TikTok平台</span>
                         </li>
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-blue-600"></div>
-                            <span>优化时段分配策略</span>
+                            <i class="fas fa-check-circle text-blue-600"></i>
+                            <span>优化投放时段，提升效果</span>
                         </li>
                     </ul>
                 </div>
                 <div class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-                    <h3 class="font-medium mb-2">创意策略</h3>
+                    <h3 class="font-medium mb-2">创意优化</h3>
                     <ul class="space-y-2 text-sm">
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
-                            <span>加强爆款视频素材转化</span>
+                            <i class="fas fa-lightbulb text-purple-600"></i>
+                            <span>发现3个高转化创意模式，建议扩大投放</span>
                         </li>
                         <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-purple-600"></div>
-                            <span>持续优化素材表现</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg">
-                    <h3 class="font-medium mb-2">人群策略</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
-                            <span>精细化人群分层</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-pink-600"></div>
-                            <span>智能出价策略</span>
+                            <i class="fas fa-lightbulb text-purple-600"></i>
+                            <span>优化素材开场，提升观看完整率</span>
                         </li>
                     </ul>
                 </div>
@@ -218,48 +221,119 @@
     </div>
 
     <script>
-        document.querySelectorAll('.tabs-trigger').forEach(trigger => {
-            trigger.addEventListener('click', () => {
-                document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tabs-content').forEach(c => c.classList.remove('active'));
-                trigger.classList.add('active');
-                document.querySelector(trigger.getAttribute('data-target')).classList.add('active');
-            });
-        });
+        // Perplexity AI API 配置
+        const PERPLEXITY_API_KEY = 'YOUR_PERPLEXITY_API_KEY'; // 替换为实际的API key
+        const API_ENDPOINT = 'https://api.perplexity.ai/chat/completions';
 
-        const performanceData = [
-            { day: 'Mon', impression: 85000, click: 4200, conversion: 580 },
-            { day: 'Tue', impression: 92000, click: 4800, conversion: 620 },
-            { day: 'Wed', impression: 78000, click: 3900, conversion: 480 },
-            { day: 'Thu', impression: 88000, click: 4500, conversion: 600 },
-            { day: 'Fri', impression: 95000, click: 5100, conversion: 680 }
-        ];
+        let chatHistory = [];
 
-        const platformData = [
-            { platform: 'TikTok', budget: 12000, roi: 3.2, ctr: 4.8 },
-            { platform: 'Kuaishou', budget: 8000, roi: 2.8, ctr: 4.2 },
-            { platform: 'RED', budget: 6000, roi: 2.5, ctr: 3.8 },
-            { platform: 'Douyin', budget: 15000, roi: 3.5, ctr: 5.2 }
-        ];
+        // Chatbot功能实现
+        async function sendQuery() {
+            const input = document.getElementById('queryInput');
+            const query = input.value.trim();
+            if (!query) return;
 
+            appendMessage('user', query);
+            input.value = '';
+            showTypingIndicator();
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'mixtral-8x7b-instruct',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: '你是OIKFP系统的投放优化专家，专注于广告投放策略和效果优化。'
+                            },
+                            ...chatHistory,
+                            { role: 'user', content: query }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                hideTypingIndicator();
+                const aiResponse = data.choices[0].message.content;
+                appendMessage('assistant', aiResponse);
+                chatHistory.push(
+                    { role: 'user', content: query },
+                    { role: 'assistant', content: aiResponse }
+                );
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                appendMessage('system', '抱歉，出现了一些问题，请稍后再试。');
+            }
+        }
+
+        // 消息展示相关函数
+        function appendMessage(role, content) {
+            const chatHistoryElement = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role === 'user' ? 'user-message' : 'bot-message'}`;
+            
+            const iconClass = role === 'user' ? 'fa-user' : 'fa-robot';
+            const iconColor = role === 'user' ? 'text-blue-600' : 'text-purple-600';
+            
+            messageDiv.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <i class="fas ${iconClass} ${iconColor}"></i>
+                    <div class="flex-1">
+                        <div class="font-medium mb-1">${role === 'user' ? '您' : 'AI助手'}</div>
+                        <div class="text-sm">${content}</div>
+                    </div>
+                </div>
+            `;
+            
+            chatHistoryElement.appendChild(messageDiv);
+            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const chatHistoryElement = document.getElementById('chatHistory');
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'typingIndicator';
+            indicatorDiv.className = 'typing-indicator';
+            indicatorDiv.innerHTML = `
+                <div class="typing-dot" style="animation-delay: 0s"></div>
+                <div class="typing-dot" style="animation-delay: 0.2s"></div>
+                <div class="typing-dot" style="animation-delay: 0.4s"></div>
+            `;
+            chatHistoryElement.appendChild(indicatorDiv);
+            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        // 初始化图表
         const performanceChart = echarts.init(document.getElementById('performanceChart'));
+        const platformChart = echarts.init(document.getElementById('platformChart'));
+        const creativeChart = echarts.init(document.getElementById('creativeChart'));
+        const creativeTypeChart = echarts.init(document.getElementById('creativeTypeChart'));
+        const creativeDurationChart = echarts.init(document.getElementById('creativeDurationChart'));
+
+        // 投放效果趋势图配置
         const performanceOption = {
             tooltip: {
                 trigger: 'axis'
             },
             legend: {
-                data: ['展示量', '点击量', '转化量']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
+                data: ['展示量', 'CTR', 'CVR']
             },
             xAxis: {
                 type: 'category',
-                boundaryGap: false,
-                data: performanceData.map(item => item.day)
+                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
             },
             yAxis: {
                 type: 'value'
@@ -268,62 +342,115 @@
                 {
                     name: '展示量',
                     type: 'line',
-                    data: performanceData.map(item => item.impression)
+                    data: [85000, 92000, 78000, 88000, 95000, 82000, 89000]
                 },
                 {
-                    name: '点击量',
+                    name: 'CTR',
                     type: 'line',
-                    data: performanceData.map(item => item.click)
+                    data: [4.8, 5.2, 4.5, 4.9, 5.4, 4.7, 5.0]
                 },
                 {
-                    name: '转化量',
+                    name: 'CVR',
                     type: 'line',
-                    data: performanceData.map(item => item.conversion)
+                    data: [2.5, 2.8, 2.3, 2.6, 2.9, 2.4, 2.7]
                 }
             ]
         };
-        performanceChart.setOption(performanceOption);
 
-        const platformChart = echarts.init(document.getElementById('platformChart'));
+        // 平台分布图配置
         const platformOption = {
+            tooltip: {
+                trigger: 'item'
+            },
+            series: [
+                {
+                    name: '平台分布',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    data: [
+                        { value: 45, name: 'TikTok' },
+                        { value: 25, name: 'Instagram' },
+                        { value: 20, name: 'Facebook' },
+                        { value: 10, name: 'Others' }
+                    ]
+                }
+            ]
+        };
+
+        // 素材效果图配置
+        const creativeOption = {
             tooltip: {
                 trigger: 'axis'
             },
-            legend: {
-                data: ['预算', 'ROI', 'CTR%']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
             xAxis: {
                 type: 'category',
-                data: platformData.map(item => item.platform)
+                data: ['素材A', '素材B', '素材C', '素材D', '素材E']
             },
             yAxis: {
                 type: 'value'
             },
             series: [
                 {
-                    name: '预算',
                     type: 'bar',
-                    data: platformData.map(item => item.budget)
-                },
-                {
-                    name: 'ROI',
-                    type: 'bar',
-                    data: platformData.map(item => item.roi)
-                },
-                {
-                    name: 'CTR%',
-                    type: 'bar',
-                    data: platformData.map(item => item.ctr)
+                    data: [4.8, 3.2, 5.4, 3.8, 4.2]
                 }
             ]
         };
+
+        // 素材类型分布图配置
+        const creativeTypeOption = {
+            tooltip: {
+                trigger: 'item'
+            },
+            series: [
+                {
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    data: [
+                        { value: 40, name: '产品展示' },
+                        { value: 30, name: '场景应用' },
+                        { value: 20, name: '用户评价' },
+                        { value: 10, name: '其他' }
+                    ]
+                }
+            ]
+        };
+
+        // 素材时长分析图配置
+        const creativeDurationOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            xAxis: {
+                type: 'category',
+                data: ['0-15s', '15-30s', '30-60s', '60s+']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: [45, 32, 15, 8]
+                }
+            ]
+        };
+
+        // 设置图表配置
+        performanceChart.setOption(performanceOption);
         platformChart.setOption(platformOption);
+        creativeChart.setOption(creativeOption);
+        creativeTypeChart.setOption(creativeTypeOption);
+        creativeDurationChart.setOption(creativeDurationOption);
+
+        // 响应式处理
+        window.addEventListener('resize', () => {
+            performanceChart.resize();
+            platformChart.resize();
+            creativeChart.resize();
+            creativeTypeChart.resize();
+            creativeDurationChart.resize();
+        });
     </script>
 </body>
 </html>

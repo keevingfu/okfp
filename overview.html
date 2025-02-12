@@ -29,22 +29,64 @@
         .tabs-content.active {
             display: block;
         }
+        .chat-message {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background-color: #f0f9ff;
+            margin-left: 20%;
+        }
+        .bot-message {
+            background-color: #f8f9fa;
+            margin-right: 20%;
+        }
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            padding: 8px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: typing 1s infinite ease-in-out;
+        }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
     <div class="w-full space-y-6">
-        <!-- AI对话区 -->
+        <!-- AI智能助手 -->
         <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-brain"></i>
-                <h2>AI智能分析</h2>
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-robot text-blue-600"></i>
+                <h2 class="text-xl font-semibold">AI智能助手</h2>
             </div>
             <div class="space-y-4">
                 <div class="flex gap-2">
-                    <input id="query" type="text" placeholder="询问任何关于OIKFP的问题，如'最近三个月KOC内容表现如何？'" class="flex-1 p-3 rounded-lg border">
-                    <button onClick="handleQuery()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">分析</button>
+                    <input 
+                        id="queryInput" 
+                        type="text" 
+                        placeholder="询问任何关于OIKFP的问题，如'分析最近的营销效果...'" 
+                        class="flex-1 p-3 rounded-lg border"
+                    >
+                    <button 
+                        onclick="sendQuery()" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                        分析
+                    </button>
                 </div>
-                <div id="chatHistory" class="space-y-4 max-h-80 overflow-y-auto bg-white p-4 rounded-lg"></div>
+                <div id="chatHistory" class="max-h-80 overflow-y-auto bg-white p-4 rounded-lg">
+                    <!-- 聊天记录将在这里动态添加 -->
+                </div>
             </div>
         </div>
 
@@ -52,7 +94,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-brain text-blue-600 w-6 h-6"></i>
+                    <i class="fas fa-brain text-blue-600"></i>
                     <h3 class="font-medium">AI决策</h3>
                 </div>
                 <div class="text-2xl font-bold text-blue-600">95%</div>
@@ -60,23 +102,23 @@
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-magic text-purple-600 w-6 h-6"></i>
-                    <h3 class="font-medium">协同效应</h3>
+                    <i class="fas fa-chart-line text-purple-600"></i>
+                    <h3 class="font-medium">内容效果</h3>
                 </div>
                 <div class="text-2xl font-bold text-purple-600">+45%</div>
-                <div class="text-sm text-purple-600">效率提升</div>
+                <div class="text-sm text-purple-600">转化提升</div>
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-arrow-right text-pink-600 w-6 h-6"></i>
-                    <h3 class="font-medium">转化提升</h3>
+                    <i class="fas fa-users text-pink-600"></i>
+                    <h3 class="font-medium">用户增长</h3>
                 </div>
                 <div class="text-2xl font-bold text-pink-600">+32%</div>
-                <div class="text-sm text-pink-600">整体转化</div>
+                <div class="text-sm text-pink-600">月环比</div>
             </div>
             <div class="p-6 bg-white rounded-lg shadow">
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fas fa-chart-line text-green-600 w-6 h-6"></i>
+                    <i class="fas fa-dollar-sign text-green-600"></i>
                     <h3 class="font-medium">ROI</h3>
                 </div>
                 <div class="text-2xl font-bold text-green-600">320%</div>
@@ -84,96 +126,61 @@
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="w-full">
-            <div class="tabs-list">
-                <div class="tabs-trigger active" data-target="#module">模块表现</div>
-                <div class="tabs-trigger" data-target="#synergy">协同效果</div>
-                <div class="tabs-trigger" data-target="#optimization">优化建议</div>
+        <!-- 主要内容区 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 左侧：整体表现趋势 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-area text-blue-600"></i>
+                    整体表现趋势
+                </h3>
+                <div id="trendChart" class="h-80"></div>
             </div>
-            <div id="module" class="tabs-content active">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">模块表现分析</h3>
-                    <div id="moduleChart" class="h-80"></div>
-                </div>
-            </div>
-            <div id="synergy" class="tabs-content">
-                <div class="p-6 bg-white rounded-lg shadow">
-                    <h3 class="font-medium mb-4">协同效果分析</h3>
-                    <div id="synergyChart" class="h-80"></div>
-                </div>
-            </div>
-            <div id="optimization" class="tabs-content">
-                <div class="p-6 bg-white rounded-lg shadow space-y-4">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="font-medium mb-2">内容策略优化</h3>
-                        <ul class="space-y-2 text-sm">
-                            <li class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-blue-600"></div>
-                                <span>将高效KOC内容快速转化为投放素材</span>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-blue-600"></div>
-                                <span>基于市场洞察优化内容方向</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="font-medium mb-2">投放优化建议</h3>
-                        <ul class="space-y-2 text-sm">
-                            <li class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-purple-600"></div>
-                                <span>调整投放时段，提升效果</span>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-purple-600"></div>
-                                <span>优化目标人群定向</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="font-medium mb-2">私域运营建议</h3>
-                        <ul class="space-y-2 text-sm">
-                            <li class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-pink-600"></div>
-                                <span>加强高价值用户转化</span>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-pink-600"></div>
-                                <span>优化会员成长体系</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+
+            <!-- 右侧：模块协同效应 -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-medium mb-4 flex items-center gap-2">
+                    <i class="fas fa-project-diagram text-purple-600"></i>
+                    模块协同效应
+                </h3>
+                <div id="synergyChart" class="h-80"></div>
             </div>
         </div>
 
-        <!-- 协同工作流 -->
-        <div class="p-6 bg-white rounded-lg shadow">
-            <h3 class="font-medium mb-4">协同工作流</h3>
-            <div class="space-y-4">
-                <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                    <h3 class="font-medium mb-2">洞察到执行</h3>
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">1</div>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>市场洞察</span>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>内容策略</span>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>投放优化</span>
+        <!-- 系统状态 -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="font-medium mb-4">系统状态</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium">AI模型状态</span>
+                        <span class="text-green-600">运行中</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span>响应时间</span>
+                            <span>120ms</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>处理队列</span>
+                            <span>0</span>
+                        </div>
                     </div>
                 </div>
-                <div class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-                    <h3 class="font-medium mb-2">效果到优化</h3>
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">2</div>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>效果分析</span>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>策略调整</span>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>持续优化</span>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium">数据同步</span>
+                        <span class="text-green-600">已同步</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span>最后更新</span>
+                            <span>2分钟前</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>数据完整性</span>
+                            <span>100%</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -181,97 +188,120 @@
     </div>
 
     <script>
-        let chatHistory = [
-            {
-                role: 'assistant',
-                content: '你好！我是你的AI助手，可以帮你分析OIKFP的任何数据和趋势。'
-            }
-        ];
+        // Perplexity AI API 配置
+        const PERPLEXITY_API_KEY = 'YOUR_PERPLEXITY_API_KEY'; // 替换为实际的API key
+        const API_ENDPOINT = 'https://api.perplexity.ai/chat/completions';
 
-        function renderChatHistory() {
-            const chatHistoryElement = document.getElementById('chatHistory');
-            chatHistoryElement.innerHTML = '';
-            chatHistory.forEach((msg, idx) => {
-                const msgElement = document.createElement('div');
-                msgElement.classList.add('flex', 'gap-3');
-                if (msg.role === 'user') {
-                    msgElement.classList.add('justify-end');
-                }
+        let chatHistory = [];
 
-                if (msg.role === 'assistant') {
-                    const iconElement = document.createElement('div');
-                    iconElement.classList.add('w-8', 'h-8', 'rounded-full', 'bg-blue-100', 'flex', 'items-center', 'justify-center');
-                    const brainIcon = document.createElement('i');
-                    brainIcon.classList.add('fas', 'fa-brain', 'text-blue-600', 'w-5', 'h-5');
-                    iconElement.appendChild(brainIcon);
-                    msgElement.appendChild(iconElement);
-                }
-
-                const contentElement = document.createElement('div');
-                contentElement.classList.add('p-3', 'rounded-lg', 'max-w-[80%]');
-                if (msg.role === 'user') {
-                    contentElement.classList.add('bg-blue-500', 'text-white');
-                } else {
-                    contentElement.classList.add('bg-white');
-                }
-                contentElement.innerText = msg.content;
-                msgElement.appendChild(contentElement);
-
-                if (msg.role === 'user') {
-                    const userIconElement = document.createElement('div');
-                    userIconElement.classList.add('w-8', 'h-8', 'rounded-full', 'bg-blue-500', 'flex', 'items-center', 'justify-center', 'text-white');
-                    userIconElement.innerText = 'U';
-                    msgElement.appendChild(userIconElement);
-                }
-
-                chatHistoryElement.appendChild(msgElement);
-            });
-        }
-
-        function handleQuery() {
-            const queryElement = document.getElementById('query');
-            const query = queryElement.value.trim();
+        async function sendQuery() {
+            const input = document.getElementById('queryInput');
+            const query = input.value.trim();
             if (!query) return;
 
-            chatHistory.push({ role: 'user', content: query });
-            chatHistory.push({ 
-                role: 'assistant',
-                content: '根据最新数据分析，建议：1. 将KOC优质内容转为广告素材，2. 加强私域引导，3. 优化投放策略。预计可提升整体ROI 25%。'
-            });
-            queryElement.value = '';
-            renderChatHistory();
+            // 添加用户消息
+            appendMessage('user', query);
+            input.value = '';
+
+            // 显示加载指示器
+            showTypingIndicator();
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'mixtral-8x7b-instruct',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: '你是OIKFP系统的AI助手，专注于内容营销分析和决策支持。'
+                            },
+                            ...chatHistory,
+                            { role: 'user', content: query }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                
+                // 隐藏加载指示器
+                hideTypingIndicator();
+
+                // 添加AI响应
+                const aiResponse = data.choices[0].message.content;
+                appendMessage('assistant', aiResponse);
+
+                // 更新聊天历史
+                chatHistory.push(
+                    { role: 'user', content: query },
+                    { role: 'assistant', content: aiResponse }
+                );
+
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                appendMessage('system', '抱歉，出现了一些问题，请稍后再试。');
+            }
         }
 
-        document.querySelectorAll('.tabs-trigger').forEach(trigger => {
-            trigger.addEventListener('click', () => {
-                document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tabs-content').forEach(c => c.classList.remove('active'));
-                trigger.classList.add('active');
-                document.querySelector(trigger.getAttribute('data-target')).classList.add('active');
-            });
-        });
+        function appendMessage(role, content) {
+            const chatHistoryElement = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role === 'user' ? 'user-message' : 'bot-message'}`;
+            
+            const iconClass = role === 'user' ? 'fa-user' : 'fa-robot';
+            const iconColor = role === 'user' ? 'text-blue-600' : 'text-purple-600';
+            
+            messageDiv.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <i class="fas ${iconClass} ${iconColor}"></i>
+                    <div class="flex-1">
+                        <div class="font-medium mb-1">${role === 'user' ? '您' : 'AI助手'}</div>
+                        <div class="text-sm">${content}</div>
+                    </div>
+                </div>
+            `;
+            
+            chatHistoryElement.appendChild(messageDiv);
+            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+        }
 
-        const moduleData = [
-            { date: 'W1', insights: 85, koc: 78, feeds: 72, private: 68 },
-            { date: 'W2', insights: 88, koc: 82, feeds: 75, private: 72 },
-            { date: 'W3', insights: 92, koc: 85, feeds: 80, private: 78 },
-            { date: 'W4', insights: 95, koc: 89, feeds: 85, private: 82 }
-        ];
+        function showTypingIndicator() {
+            const chatHistoryElement = document.getElementById('chatHistory');
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'typingIndicator';
+            indicatorDiv.className = 'typing-indicator';
+            indicatorDiv.innerHTML = `
+                <div class="typing-dot" style="animation-delay: 0s"></div>
+                <div class="typing-dot" style="animation-delay: 0.2s"></div>
+                <div class="typing-dot" style="animation-delay: 0.4s"></div>
+            `;
+            chatHistoryElement.appendChild(indicatorDiv);
+            chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+        }
 
-        const synergisticData = [
-            { type: 'KOC转广告', before: 100, after: 150, improvement: 50 },
-            { type: '洞察到内容', before: 90, after: 160, improvement: 70 },
-            { type: '广告到私域', before: 85, after: 140, improvement: 55 },
-            { type: '私域到复购', before: 95, after: 170, improvement: 75 }
-        ];
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
 
-        const moduleChart = echarts.init(document.getElementById('moduleChart'));
-        const moduleOption = {
+        // 初始化图表
+        const trendChart = echarts.init(document.getElementById('trendChart'));
+        const synergyChart = echarts.init(document.getElementById('synergyChart'));
+
+        // 趋势图配置
+        const trendOption = {
             tooltip: {
                 trigger: 'axis'
             },
             legend: {
-                data: ['市场洞察', '内容生产', '广告投放', '私域运营']
+                data: ['市场洞察', '内容生产', '广告投放', '私域转化']
             },
             grid: {
                 left: '3%',
@@ -282,7 +312,7 @@
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                data: moduleData.map(item => item.date)
+                data: ['W1', 'W2', 'W3', 'W4']
             },
             yAxis: {
                 type: 'value'
@@ -291,34 +321,36 @@
                 {
                     name: '市场洞察',
                     type: 'line',
-                    data: moduleData.map(item => item.insights)
+                    data: [85, 88, 92, 95]
                 },
                 {
                     name: '内容生产',
                     type: 'line',
-                    data: moduleData.map(item => item.koc)
+                    data: [78, 82, 85, 89]
                 },
                 {
                     name: '广告投放',
                     type: 'line',
-                    data: moduleData.map(item => item.feeds)
+                    data: [72, 75, 80, 85]
                 },
                 {
-                    name: '私域运营',
+                    name: '私域转化',
                     type: 'line',
-                    data: moduleData.map(item => item.private)
+                    data: [68, 72, 78, 82]
                 }
             ]
         };
-        moduleChart.setOption(moduleOption);
 
-        const synergyChart = echarts.init(document.getElementById('synergyChart'));
+        // 协同效应图配置
         const synergyOption = {
             tooltip: {
-                trigger: 'axis'
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
             },
             legend: {
-                data: ['优化前', '优化后', '提升量']
+                data: ['协同前', '协同后']
             },
             grid: {
                 left: '3%',
@@ -328,32 +360,34 @@
             },
             xAxis: {
                 type: 'category',
-                data: synergisticData.map(item => item.type)
+                data: ['洞察→内容', '内容→投放', '投放→私域', '私域→复购']
             },
             yAxis: {
                 type: 'value'
             },
             series: [
                 {
-                    name: '优化前',
+                    name: '协同前',
                     type: 'bar',
-                    data: synergisticData.map(item => item.before)
+                    data: [100, 100, 100, 100]
                 },
                 {
-                    name: '优化后',
+                    name: '协同后',
                     type: 'bar',
-                    data: synergisticData.map(item => item.after)
-                },
-                {
-                    name: '提升量',
-                    type: 'bar',
-                    data: synergisticData.map(item => item.improvement)
+                    data: [145, 158, 132, 168]
                 }
             ]
         };
+
+        // 设置图表配置
+        trendChart.setOption(trendOption);
         synergyChart.setOption(synergyOption);
 
-        document.addEventListener('DOMContentLoaded', renderChatHistory);
+        // 响应式处理
+        window.addEventListener('resize', () => {
+            trendChart.resize();
+            synergyChart.resize();
+        });
     </script>
 </body>
 </html>

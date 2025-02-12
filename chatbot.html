@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Growth Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <style>
+        .chat-container {
+            height: calc(100vh - 160px);
+        }
+        .message {
+            max-width: 85%;
+            margin-bottom: 1rem;
+        }
+        .user-message {
+            margin-left: auto;
+            background-color: #e3f2fd;
+        }
+        .ai-message {
+            margin-right: auto;
+            background-color: #f8fafc;
+        }
+        .thinking {
+            position: relative;
+            padding-left: 20px;
+        }
+        .thinking::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            animation: thinking 1s infinite;
+        }
+        .related-questions {
+            transition: all 0.3s ease;
+        }
+        .related-questions:hover {
+            transform: translateY(-2px);
+        }
+        @keyframes thinking {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        .source-link {
+            color: #3b82f6;
+            text-decoration: underline;
+            margin-right: 1rem;
+        }
+        .reasoning-step {
+            border-left: 2px solid #e5e7eb;
+            margin-left: 1rem;
+            padding-left: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white shadow-sm py-4">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-brain text-blue-600 text-2xl"></i>
+                    <h1 class="text-xl font-semibold">AI Growth Assistant</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i class="fas fa-history mr-2"></i>历史记录
+                    </button>
+                    <button class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i class="fas fa-cog mr-2"></i>设置
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <!-- 左侧内容 -->
+                <div class="space-y-6">
+                    <h2 class="text-4xl font-bold text-gray-900">
+                        智能内容增长决策系统
+                    </h2>
+                    <p class="text-xl text-gray-600">
+                        基于AI驱动的全链路内容营销解决方案，助力品牌实现智能化增长
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-chart-line text-blue-600"></i>
+                            <span class="text-gray-700">数据驱动</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-brain text-purple-600"></i>
+                            <span class="text-gray-700">智能决策</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-rocket text-indigo-600"></i>
+                            <span class="text-gray-700">快速增长</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="px-4 py-2 bg-white rounded-full shadow-sm flex items-center space-x-2">
+                            <i class="fas fa-lightbulb text-yellow-500"></i>
+                            <span>市场洞察</span>
+                        </div>
+                        <div class="px-4 py-2 bg-white rounded-full shadow-sm flex items-center space-x-2">
+                            <i class="fas fa-users text-purple-500"></i>
+                            <span>内容创作</span>
+                        </div>
+                        <div class="px-4 py-2 bg-white rounded-full shadow-sm flex items-center space-x-2">
+                            <i class="fas fa-bullseye text-red-500"></i>
+                            <span>精准投放</span>
+                        </div>
+                        <div class="px-4 py-2 bg-white rounded-full shadow-sm flex items-center space-x-2">
+                            <i class="fas fa-user-shield text-green-500"></i>
+                            <span>私域运营</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧统计 -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">98%</div>
+                        <div class="text-gray-600">AI预测准确率</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                        <div class="text-3xl font-bold text-purple-600 mb-2">85%</div>
+                        <div class="text-gray-600">营销效率提升</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                        <div class="text-3xl font-bold text-indigo-600 mb-2">200+</div>
+                        <div class="text-gray-600">服务品牌数量</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2">45%</div>
+                        <div class="text-gray-600">平均ROI提升</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- 功能模块说明 -->
+        <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-6 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold mb-4">功能模块说明</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Insights 模块 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+                        <h2 class="text-lg font-semibold">Insights 洞察</h2>
+                    </div>
+                    <p class="text-gray-600 mb-4">市场趋势分析、用户需求洞察、竞品分析和机会识别</p>
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">推荐问题：</p>
+                        <div class="space-y-1">
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 分析智能家居行业最新的市场趋势和机会
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 我们的产品与主要竞品相比有什么优势和不足
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 用户对智能产品最关注的三个痛点是什么
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KOC & KOL 模块 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-users text-purple-500 text-xl"></i>
+                        <h2 class="text-lg font-semibold">KOC & KOL 内容创作</h2>
+                    </div>
+                    <p class="text-gray-600 mb-4">内容创作策略、KOL合作、创意优化和效果评估</p>
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">推荐问题：</p>
+                        <div class="space-y-1">
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 如何策划一个爆款短视频内容方案
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 选择KOL合作时应该注意哪些关键指标
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 如何提高内容的互动率和转化率
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feeds 模块 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-bullseye text-red-500 text-xl"></i>
+                        <h2 class="text-lg font-semibold">Feeds 投放</h2>
+                    </div>
+                    <p class="text-gray-600 mb-4">广告投放策略、素材优化、效果分析和预算分配</p>
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">推荐问题：</p>
+                        <div class="space-y-1">
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 如何优化广告素材提升点击率
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 不同平台的投放预算应该如何分配
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 如何降低获客成本提升ROI
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Private 模块 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-user-shield text-green-500 text-xl"></i>
+                        <h2 class="text-lg font-semibold">Private 私域</h2>
+                    </div>
+                    <p class="text-gray-600 mb-4">私域流量运营、用户维护、社群管理和转化提升</p>
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">推荐问题：</p>
+                        <div class="space-y-1">
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 如何提升私域用户的活跃度和复购率
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 社群运营的最佳实践和注意事项
+                            </div>
+                            <div class="text-sm text-blue-600 cursor-pointer hover:underline" onclick="setQuestion(this.textContent)">
+                                ➤ 如何通过私域内容提升品牌忠诚度
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天对话框 -->
+        <div class="chat-container overflow-y-auto mb-6 bg-white rounded-lg shadow-sm p-6">
+            <div id="chatMessages" class="space-y-4">
+                <!-- 输入框 -->
+                <div class="flex space-x-4 mb-6">
+                    <input 
+                        type="text" 
+                        id="userInput"
+                        class="flex-1 p-4 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="输入您的问题，如：如何提升短视频内容的转化率？"
+                    >
+                    <button 
+                        onclick="sendMessage()"
+                        class="px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                        <span>发送</span>
+                    </button>
+                </div>
+
+                <!-- 欢迎消息 -->
+                <div class="message ai-message p-4 rounded-lg">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-robot text-blue-600 mt-1"></i>
+                        <div>
+                            <p class="text-gray-800">欢迎使用 AI Growth Assistant！我是您的内容增长决策助手，可以帮您：</p>
+                            <ul class="list-disc ml-4 mt-2 space-y-1 text-gray-600">
+                                <li>分析市场趋势和用户洞察</li>
+                                <li>优化内容创作和投放策略</li>
+                                <li>提供私域运营建议</li>
+                                <li>评估营销效果</li>
+                            </ul>
+                            <p class="mt-2 text-gray-800">请告诉我您想了解什么？</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const OPENAI_API_KEY = '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'; // 替换为你的 OpenAI API key
+        const API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+        let isThinking = false;
+
+        async function sendMessage() {
+            if (isThinking) return;
+            
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // 添加用户消息
+            appendMessage('user', message);
+            input.value = '';
+
+            // 显示思考状态
+            isThinking = true;
+            showThinking();
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4",  // 修改为标准的 GPT-4 模型名称
+                        messages: [{
+                            role: "system",
+                            content: `你是一个专业的内容营销和增长策略顾问。请按照以下格式提供分析和建议：
+
+# 相关资料
+- 提供3-4条相关的市场数据或研究发现
+- 引用具体的行业报告或案例
+
+# 分析过程
+1. 分析问题背景和关键因素
+2. 评估现状和挑战
+3. 识别机会和优势
+4. 考虑潜在风险
+
+# 解决方案
+- 提供3-5条具体的执行建议
+- 每条建议都要有明确的实施步骤
+- 包含可衡量的指标
+
+# 行动计划
+1. 短期行动项（1-2周）
+2. 中期目标（1-3个月）
+3. 长期规划（3-6个月）
+
+# 延伸思考
+- 提供3个相关的后续问题
+- 每个问题都应该帮助深化或拓展当前话题
+
+请确保回答专业、具体且可执行。使用数据支持论点，给出明确的行动建议。`
+                        }, {
+                            role: "user",
+                            content: message
+                        }],
+                        temperature: 0.7,
+                        max_tokens: 2000
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API Error:', errorData);
+                    throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                hideThinking();
+
+                // 解析 AI 响应，将其转换为结构化格式
+                const responseText = data.choices[0].message.content;
+                const aiResponse = parseAIResponse(responseText);
+                appendMessage('ai', aiResponse);
+
+            } catch (error) {
+                console.error('Error:', error);
+                hideThinking();
+                appendMessage('ai', '抱歉，出现了一些问题，请稍后再试。错误信息：' + error.message);
+            } finally {
+                isThinking = false;
+            }
+        }
+
+        function parseAIResponse(text) {
+            // 使用正则表达式解析 markdown 格式的响应
+            const sections = {
+                searchResults: [],
+                reasoning: [],
+                answer: '',
+                nextQuestions: []
+            };
+
+            // 解析相关资料
+            const resourcesMatch = text.match(/# 相关资料\n([\s\S]*?)(?=\n#|$)/);
+            if (resourcesMatch) {
+                sections.searchResults = resourcesMatch[1]
+                    .split('\n')
+                    .filter(line => line.trim().startsWith('-'))
+                    .map(line => ({
+                        title: line.replace('-', '').trim(),
+                        url: '#',
+                        snippet: line.replace('-', '').trim()
+                    }));
+            }
+
+            // 解析分析过程
+            const analysisMatch = text.match(/# 分析过程\n([\s\S]*?)(?=\n#|$)/);
+            if (analysisMatch) {
+                sections.reasoning = analysisMatch[1]
+                    .split('\n')
+                    .filter(line => line.trim().match(/^\d+\./))
+                    .map(line => line.replace(/^\d+\./, '').trim());
+            }
+
+            // 提取主要内容
+            sections.answer = text;
+
+            // 解析延伸思考
+            const questionsMatch = text.match(/# 延伸思考\n([\s\S]*?)(?=\n#|$)/);
+            if (questionsMatch) {
+                sections.nextQuestions = questionsMatch[1]
+                    .split('\n')
+                    .filter(line => line.trim().startsWith('-'))
+                    .map(line => line.replace('-', '').trim());
+            }
+
+            return sections;
+        }
+
+        function appendSearchStep(message) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'message ai-message p-4 rounded-lg search-step';
+            stepDiv.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-search text-blue-600 mt-1"></i>
+                    <div class="flex-1">
+                        <div class="text-sm text-gray-600">${message}</div>
+                        <div class="loading-dots mt-2">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesDiv.appendChild(stepDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function appendMessage(role, content) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message p-4 rounded-lg`;
+
+            if (typeof content === 'object') {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-robot text-blue-600 mt-1"></i>
+                        <div class="flex-1">
+                            <!-- 搜索结果 -->
+                            <div class="mb-4">
+                                <div class="text-sm text-gray-500 mb-2">搜索结果：</div>
+                                <div class="space-y-2">
+                                    ${content.searchResults.map(result => `
+                                        <div class="bg-gray-50 p-3 rounded">
+                                            <a href="${result.url}" class="text-blue-600 hover:underline">${result.title}</a>
+                                            <p class="text-sm text-gray-600 mt-1">${result.snippet}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- 推理过程 -->
+                            <div class="mb-4">
+                                <div class="text-sm text-gray-500 mb-2">推理过程：</div>
+                                <div class="space-y-2">
+                                    ${content.reasoning.map((step, index) => `
+                                        <div class="reasoning-step">
+                                            <div class="text-sm font-medium">步骤 ${index + 1}</div>
+                                            <div class="text-gray-700">${step}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- 回答内容 -->
+                            <div class="mb-4">
+                                <div class="text-sm text-gray-500 mb-2">分析结论：</div>
+                                <div class="text-gray-800 whitespace-pre-wrap">${content.answer}</div>
+                            </div>
+
+                            <!-- 后续问题 -->
+                            <div>
+                                <div class="text-sm text-gray-500 mb-2">您可能还想了解：</div>
+                                <div class="grid gap-2">
+                                    ${content.nextQuestions.map(q => `
+                                        <div class="related-questions p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100"
+                                             onclick="setQuestion('${q}')">
+                                            ${q}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-${role === 'user' ? 'user' : 'robot'} text-${role === 'user' ? 'gray' : 'blue'}-600 mt-1"></i>
+                        <div class="text-gray-800">${content}</div>
+                    </div>
+                `;
+            }
+
+            // 移除之前的搜索步骤提示
+            document.querySelectorAll('.search-step').forEach(el => el.remove());
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showThinking() {
+            const messagesDiv = document.getElementById('chatMessages');
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.id = 'thinking';
+            thinkingDiv.className = 'message ai-message p-4 rounded-lg';
+            thinkingDiv.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-robot text-blue-600 mt-1"></i>
+                    <div class="thinking">正在思考...</div>
+                </div>
+            `;
+            messagesDiv.appendChild(thinkingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function hideThinking() {
+            const thinkingDiv = document.getElementById('thinking');
+            if (thinkingDiv) {
+                thinkingDiv.remove();
+            }
+        }
+
+        function generateRelatedQuestions(currentQuestion) {
+            // 基于当前问题生成相关问题
+            const relatedQuestions = [
+                '如何优化内容创作流程？',
+                '如何提高用户互动率？',
+                '如何评估营销ROI？'
+            ];
+
+            const messagesDiv = document.getElementById('chatMessages');
+            const questionsDiv = document.createElement('div');
+            questionsDiv.className = 'message ai-message p-4 rounded-lg';
+            questionsDiv.innerHTML = `
+                <div class="text-sm text-gray-500 mb-2">您可能还想了解：</div>
+                <div class="space-y-2">
+                    ${relatedQuestions.map(q => `
+                        <div class="related-questions p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100"
+                             onclick="document.getElementById('userInput').value = '${q}'">
+                            ${q}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            messagesDiv.appendChild(questionsDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // 监听回车键
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function setQuestion(question) {
+            const input = document.getElementById('userInput');
+            input.value = question.replace('➤ ', '');
+            input.focus();
+        }
+    </script>
+</body>
+</html> 
